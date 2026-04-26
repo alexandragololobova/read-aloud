@@ -1,4 +1,5 @@
 import { useTheme } from '../context/ThemeContext'
+import ThemeSwitcher from './ThemeSwitcher'
 
 const sessions = {
     today: [
@@ -70,8 +71,13 @@ export default function Sidebar() {
                 <SessionGroup title="Earlier" items={sessions.earlier} />
             </div>
 
+            {/* Theme switcher */}
+            <div className="px-2 py-3 border-t border-app-border">
+                <ThemeSwitcher />
+            </div>
+
             {/* User pill */}
-            <div className="p-4 border-t border-app-border">
+            <div className="px-4 pb-4">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-app-accent flex items-center justify-center text-white text-xs font-semibold font-ui">
                         MC
