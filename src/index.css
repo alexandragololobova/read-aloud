@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+    --font-family-body: Georgia, serif;
+    --font-family-ui: Inter, sans-serif;
+
+    --color-app-bg: #faf6f0;
+    --color-app-sidebar: #f4efe6;
+    --color-app-card: #eae2d5;
+    --color-app-border: #e6dec8;
+    --color-app-ink: #1f1a17;
+    --color-app-muted: #8c7a6b;
+    --color-app-accent: #d97757;
+    --color-app-accent-secondary: #d97757;
+}
+
+@layer base {
+    body {
+        font-family: var(--font-family-body);
+        background-color: var(--color-app-bg);
+        color: var(--color-app-ink);
+    }
+}
