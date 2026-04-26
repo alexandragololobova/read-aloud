@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ThemeProvider } from './context/ThemeContext'
 import Sidebar from './components/Sidebar'
 import Reader from './components/Reader'
@@ -6,23 +6,66 @@ import PlayerBar from './components/PlayerBar'
 import MobileLayout from './components/MobileLayout'
 import PasteModal from './components/PasteModal'
 import { useSpeech } from './hooks/useSpeech'
+import { useAutoSave } from './hooks/useAutoSave'
 import { cleanPlainText } from './utils/cleanText'
 
 function AppContent() {
     const [showPasteModal, setShowPasteModal] = useState(false)
     const [session, setSession] = useState({
         title: 'How to Do Great Work',
-        content: null, // null means use the default hardcoded essay
+        content: null,
     })
 
     const speech = useSpeech()
+    const { getSavedDraft, clearDraft } = useAutoSave({
+        title: session.title,
+        content: session.content,
+        currentIndex: speech.currentIndex,
+        isPlaying: speech.isPlaying,
+        rate: speech.rate,
+        voiceName: speech.voice?.name || null,
+    })
+
+    // Restore draft on first mount
+    useEffect(() => {
+        const draft = getSavedDraft()
+        if (!draft || !draft.content) return
+
+        setSession({ title: draft.title, content: draft.content })
+        speech.loadText(draft.content)
+
+        if (draft.rate) speech.changeRate(draft.rate)
+
+        if (draft.currentIndex >= 0) {
+            speech.jumpTo(draft.currentIndex)
+        }
+
+        // Restore voice — may need to wait for voices to load
+        if (draft.voiceName) {
+            const trySetVoice = () => {
+                const voices = window.speechSynthesis.getVoices()
+                const savedVoice = voices.find(v => v.name === draft.voiceName)
+                if (savedVoice) {
+                    speech.changeVoice(savedVoice)
+                } else if (voices.length === 0) {
+                    setTimeout(trySetVoice, 200)
+                }
+            }
+            trySetVoice()
+        }
+    }, [])
 
     const handleNewSession = (data) => {
+        clearDraft()
         const cleaned = cleanPlainText(data.content)
+        speech.stop()
+        speech.changeRate(1)
         setSession({ title: data.title, content: cleaned })
-        speech.loadText(cleaned)
-        // Auto-play
-        setTimeout(() => speech.play(), 300)
+        // Small delay to ensure cancel completes before loading new text
+        setTimeout(() => {
+            speech.loadText(cleaned)
+            setTimeout(() => speech.play(), 200)
+        }, 50)
     }
 
     return (
