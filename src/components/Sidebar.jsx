@@ -46,7 +46,7 @@ function SessionGroup({ title, items }) {
     )
 }
 
-export default function Sidebar() {
+export default function Sidebar({ onNewSession }) {
     return (
         <aside className="w-[280px] h-screen flex flex-col border-r border-app-border bg-app-sidebar">
             {/* Wordmark */}
@@ -58,8 +58,11 @@ export default function Sidebar() {
 
             {/* New session button */}
             <div className="px-4 mb-5">
-                <button className="w-full py-2.5 rounded-full bg-app-accent text-white text-sm font-semibold font-ui
-          hover:opacity-90 transition-opacity active:scale-95">
+                <button
+                    onClick={onNewSession}
+                    className="w-full py-2.5 rounded-full bg-app-accent text-white text-sm font-semibold font-ui
+            hover:opacity-90 transition-opacity active:scale-95"
+                >
                     + New session
                 </button>
             </div>
